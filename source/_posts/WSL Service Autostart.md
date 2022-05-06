@@ -1,12 +1,11 @@
 ---
 title: Linux子系统(WSL)中的服务开机启动
 date: 2019-3-2 12:24
-categories: 
+categories:
 	- Deploy
-tags: 
+tags:
 	- Debian
 	- WSL
-cover: https://image.zsver.com/2020/05/23/6a7691490d5dc.jpg
 ---
 
 ## 环境简介
@@ -88,7 +87,7 @@ ws.run "wsl -d debian -u root /etc/init.wsl start", vbhide
 
 ### 2020年7月13日 更
 
-WSL2 中用这种方式有问题，系统启动后不能通过localhost 访问。  
+WSL2 中用这种方式有问题，系统启动后不能通过localhost 访问。
 暂时还未找到解决方式。
 
 ## 原文链接

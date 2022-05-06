@@ -1,13 +1,12 @@
 ---
 title: ASP.NET 之 IIS托管的后台任务
 date: 2019-6-1 12:39
-categories: 
+categories:
 	- .NET
-tags: 
+tags:
 	- IIS
 	- Background Task
 	- C#
-cover: https://image.zsver.com/2020/05/23/5f1cb7c259843.jpg
 ---
 
 ## 前言
@@ -81,7 +80,7 @@ public class JobManager
 ### 1.Application_End 中唤醒 IIS
 
 ​&emsp;&emsp;IIS的应用程序池进行回收的时候会调用*Application_End* 方法，有了这个条件，我们便可以在*Application_End*方法中做些文章了。
-怎么做呢，我们只简单的访问一下自己的网就好了。  
+怎么做呢，我们只简单的访问一下自己的网就好了。
 IIS 想休息，因为觉得没人拜访了，那我们就登门拜访。
 
 ​关键代码如下所示

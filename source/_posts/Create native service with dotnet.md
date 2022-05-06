@@ -1,12 +1,11 @@
 ---
 title: 基于netcore 编写本地服务
-categories: 
+categories:
     - .NET
-tags: 
+tags:
     - C#
     - Service
 date: 2020年5月27日
-cover: https://image.zsver.com/2020/05/23/ff71252584474.jpg
 ---
 
 ## 前言
@@ -26,7 +25,7 @@ cover: https://image.zsver.com/2020/05/23/ff71252584474.jpg
 
 启动`VisualStudio 2019`，选择`创建新项目`,在上方的搜索栏搜索`service` ,如下图。
 
-![创建Worker Service](https://image.zsver.com/2020/06/01/45ed7d8f41ad2.png)
+![create-project.png](https://image.zsver.com/i/2022/05/06/62752ba007003.png)
 
 或者使用 `dotnet new worker` 命令
 
@@ -78,11 +77,11 @@ dotnet new worker -n MyService
 ```
 
 这两个文件中的代码都是简洁明了的。
-`Program.cs` 创建`Host`并对Worker进行托管。  
+`Program.cs` 创建`Host`并对Worker进行托管。
 
-那么我们先看一下Worker是什么?  
- &emsp; 从`Worker.cs`中可见Worker只是继承自`BackgroundService`的子类。  
-`BackgroundService`又是何方神圣呢？  
+那么我们先看一下Worker是什么?
+ &emsp; 从`Worker.cs`中可见Worker只是继承自`BackgroundService`的子类。
+`BackgroundService`又是何方神圣呢？
   &emsp;看一下`MyService`的项目依赖，依赖包里有`Microsoft.Extensions.Hosting`这一项，`BackgroundService` 就是源自于此。
 
 ### 2. 编写属于自己的Worker
@@ -135,18 +134,18 @@ dotnet new worker -n MyService
 注释掉 `services.AddHostedService<Worker>();`,而只关注`MyWorker`
 
 运行之后，就可以看到内容输出了。但是，为什么还会有控制台窗口，而不是一个无界面的服务呢？
-![运行情况](https://image.zsver.com/2020/06/01/1a5bde9b72a3e.gif)
-嗯mm，因为现在它还是一个控制台程序。  
-那么，如和部署成服务呢？  
+![运行状态.gif](https://image.zsver.com/i/2022/05/06/62752ba006391.gif)
+嗯mm，因为现在它还是一个控制台程序。
+那么，如和部署成服务呢？
 
 ### 3. 部署Windows 服务
 
-首先，要做一些改动  
+首先，要做一些改动
 
 1. 为`MyService`项目添加nuget包 `Microsoft.Extensions.Hosting.WindowsServices`
 
-2. 修改 `Program.cs` 中的 `CreateHostBuilder` 函数，在最后加上 `UseWindowsService()`  
-如下  
+2. 修改 `Program.cs` 中的 `CreateHostBuilder` 函数，在最后加上 `UseWindowsService()`
+如下
 
 ```csharp
   static IHostBuilder CreateHostBuilder(string[] args)
@@ -156,8 +155,8 @@ dotnet new worker -n MyService
             }).UseWindowsService();
 ```
 
-接着  
-这里需要使用另一个工具 `sc`  
+接着
+这里需要使用另一个工具 `sc`
 打开cmd窗口（使用Powershell 也可以，但是低版本的Powershell 可能会出错）
 
 ```powershell
@@ -171,7 +170,7 @@ sc delete MyService
 
 ```
 
-程序在控制台输出，所以安装成服务并不能看到效果。不过，总而言之，使用.netcore创建服务程序很是简单。你可能会想用这种方式用在.netframework上是不是也可以。可以自己尝试。  
+程序在控制台输出，所以安装成服务并不能看到效果。不过，总而言之，使用.netcore创建服务程序很是简单。你可能会想用这种方式用在.netframework上是不是也可以。可以自己尝试。
 
 ---
 
@@ -179,8 +178,8 @@ sc delete MyService
 
 2020年7月13日 补充
 在.netframework 上使用也是没问题的，但是.netcore 可以跨平台食用
-  
-&emsp;*更多创建服务的方式，可以点击下面的引用链接*  
+
+&emsp;*更多创建服务的方式，可以点击下面的引用链接*
 
 ## 引用
 

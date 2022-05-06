@@ -1,12 +1,11 @@
 ---
 title: 内网SVN穿透踩坑
 date: 2019-3-3
-categories: 
+categories:
     - Deploy
-tags: 
+tags:
     - Deploy
     - NAT
-cover: https://image.zsver.com/2020/05/23/1bd82249672b3.jpg
 ---
 
 
