@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="潇枫十一">
+
+
+    <meta name="subtitle" content="破风万里行，终有雀归日">
+
+
+
+
+<title>基于netcore 编写本地服务 | 雀归</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.2"><link rel="alternate" href="/atom.xml" title="雀归" type="application/atom+xml">
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">雀归</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/categories">Categories</a>
+                
+                    <a class="menu-item" href="/tags">Tags</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">雀归</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/categories">Categories</a>
+                
+                    <a class="menu-item" href="/tags">Tags</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">基于netcore 编写本地服务</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">潇枫十一</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">五月 6, 2022&nbsp;&nbsp;22:12:04</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/NET/">.NET</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>服务程序，一般是指一些需要长期稳定运行，没有界面交互的程序，今天就来看一看怎么用C#在 netcore 平台来编写这类程序。</p>
+<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>以下是编写服务程序使用的工具和环境</p>
+<ul>
+<li>VisualStduio 2019</li>
+<li>.netcore 3.1</li>
+</ul>
+<h2 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h2><h3 id="1-使用Woker-Service-模板创建服务"><a href="#1-使用Woker-Service-模板创建服务" class="headerlink" title="1. 使用Woker Service 模板创建服务"></a>1. 使用Woker Service 模板创建服务</h3><p>启动<code>VisualStudio 2019</code>，选择<code>创建新项目</code>,在上方的搜索栏搜索<code>service</code> ,如下图。</p>
+<p><img src="https://image.zsver.com/i/2022/05/06/62752ba007003.png" alt="create-project.png"></p>
+<p>或者使用 <code>dotnet new worker</code> 命令</p>
+<p>这里我创建一个名为<code>MyService</code>的项目</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dotnet new worker -n MyService</span><br></pre></td></tr></table></figure>
+
+<p>浏览一下项目文件，可以看见里面有两个主要的文件</p>
+<ul>
+<li><h4 id="1-Program-cs"><a href="#1-Program-cs" class="headerlink" title="1. Program.cs"></a>1. Program.cs</h4></li>
+</ul>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="built_in">string</span>[] args</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    CreateHostBuilder(args).Build().Run();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> IHostBuilder <span class="title">CreateHostBuilder</span>(<span class="params"><span class="built_in">string</span>[] args</span>)</span> =&gt;</span><br><span class="line">          Host.CreateDefaultBuilder(args)</span><br><span class="line">              .ConfigureServices((hostContext, services) =&gt;</span><br><span class="line">              &#123;</span><br><span class="line">                  services.AddHostedService&lt;Worker&gt;();</span><br><span class="line">              &#125;);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><h4 id="2-Worker-cs"><a href="#2-Worker-cs" class="headerlink" title="2. Worker.cs"></a>2. Worker.cs</h4></li>
+</ul>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Worker</span> : <span class="title">BackgroundService</span></span><br><span class="line">&#123;</span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">readonly</span> ILogger&lt;Worker&gt; _logger;</span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="title">Worker</span>(<span class="params">ILogger&lt;Worker&gt; logger</span>)</span></span><br><span class="line">   &#123;</span><br><span class="line">       _logger = logger;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">async</span> Task <span class="title">ExecuteAsync</span>(<span class="params">CancellationToken stoppingToken</span>)</span></span><br><span class="line">   &#123;</span><br><span class="line">       <span class="keyword">while</span> (!stoppingToken.IsCancellationRequested)</span><br><span class="line">       &#123;</span><br><span class="line">           _logger.LogInformation(<span class="string">&quot;Worker running at: &#123;time&#125;&quot;</span>, DateTimeOffset.Now);</span><br><span class="line">           <span class="keyword">await</span> Task.Delay(<span class="number">1000</span>, stoppingToken);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这两个文件中的代码都是简洁明了的。<br><code>Program.cs</code> 创建<code>Host</code>并对Worker进行托管。</p>
+<p>那么我们先看一下Worker是什么?<br> &amp;emsp; 从<code>Worker.cs</code>中可见Worker只是继承自<code>BackgroundService</code>的子类。<br><code>BackgroundService</code>又是何方神圣呢？<br>  &amp;emsp;看一下<code>MyService</code>的项目依赖，依赖包里有<code>Microsoft.Extensions.Hosting</code>这一项，<code>BackgroundService</code> 就是源自于此。</p>
+<h3 id="2-编写属于自己的Worker"><a href="#2-编写属于自己的Worker" class="headerlink" title="2. 编写属于自己的Worker"></a>2. 编写属于自己的Worker</h3><p>新建 <code>MyWorker.cs</code> 文件，内容如下</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">MyWorker</span> : <span class="title">BackgroundService</span></span><br><span class="line">   &#123;</span><br><span class="line">       <span class="keyword">private</span> <span class="keyword">readonly</span> <span class="built_in">string</span>[] _lines =</span><br><span class="line">       &#123;</span><br><span class="line">           <span class="string">&quot;沉舟侧畔千帆过，&quot;</span>,</span><br><span class="line">           <span class="string">&quot;病树前头万木春。&quot;</span>,</span><br><span class="line">           <span class="string">&quot;-------------&quot;</span>,</span><br><span class="line">           <span class="string">&quot;长风破浪会有时，&quot;</span>,</span><br><span class="line">           <span class="string">&quot;直挂云帆济沧海。&quot;</span>,</span><br><span class="line">           <span class="string">&quot;-------------&quot;</span>,</span><br><span class="line">           <span class="string">&quot;谁无暴风劲雨时，&quot;</span>,</span><br><span class="line">           <span class="string">&quot;守得云开见月明。&quot;</span>,</span><br><span class="line">           <span class="string">&quot;-------------&quot;</span></span><br><span class="line">       &#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">       <span class="function"><span class="keyword">protected</span> <span class="keyword">async</span> <span class="keyword">override</span> Task <span class="title">ExecuteAsync</span>(<span class="params">CancellationToken stoppingToken</span>)</span></span><br><span class="line">       &#123;</span><br><span class="line">           <span class="keyword">while</span>(!stoppingToken.IsCancellationRequested)</span><br><span class="line">           &#123;</span><br><span class="line"></span><br><span class="line">               <span class="keyword">foreach</span> (<span class="keyword">var</span> line <span class="keyword">in</span> _lines)</span><br><span class="line">               &#123;</span><br><span class="line">                   <span class="keyword">await</span> Task.Delay(<span class="number">1000</span>);</span><br><span class="line"></span><br><span class="line">                   <span class="keyword">foreach</span> (<span class="keyword">var</span> ch <span class="keyword">in</span> line)</span><br><span class="line">                   &#123;</span><br><span class="line">                       Console.Write(ch);</span><br><span class="line">                       <span class="keyword">await</span> Task.Delay(<span class="number">100</span>);</span><br><span class="line">                   &#125;</span><br><span class="line"></span><br><span class="line">                   Console.Write(<span class="string">&quot;\r&quot;</span>);</span><br><span class="line">               &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<p>除此之外，还需要将Worker 注入。<br><code>services.AddHostedService&lt;MyWorker&gt;();</code><br>注释掉 <code>services.AddHostedService&lt;Worker&gt;();</code>,而只关注<code>MyWorker</code></p>
+<p>运行之后，就可以看到内容输出了。但是，为什么还会有控制台窗口，而不是一个无界面的服务呢？<br><img src="https://image.zsver.com/i/2022/05/06/62752ba006391.gif" alt="运行状态.gif"><br>嗯mm，因为现在它还是一个控制台程序。<br>那么，如和部署成服务呢？</p>
+<h3 id="3-部署Windows-服务"><a href="#3-部署Windows-服务" class="headerlink" title="3. 部署Windows 服务"></a>3. 部署Windows 服务</h3><p>首先，要做一些改动</p>
+<ol>
+<li><p>为<code>MyService</code>项目添加nuget包 <code>Microsoft.Extensions.Hosting.WindowsServices</code></p>
+</li>
+<li><p>修改 <code>Program.cs</code> 中的 <code>CreateHostBuilder</code> 函数，在最后加上 <code>UseWindowsService()</code><br>如下</p>
+</li>
+</ol>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> IHostBuilder <span class="title">CreateHostBuilder</span>(<span class="params"><span class="built_in">string</span>[] args</span>)</span></span><br><span class="line">          =&gt; Host.CreateDefaultBuilder(args).ConfigureServices(services =&gt;</span><br><span class="line">          &#123;</span><br><span class="line">              services.AddHostedService&lt;MyWorker&gt;();</span><br><span class="line">          &#125;).UseWindowsService();</span><br></pre></td></tr></table></figure>
+
+<p>接着<br>这里需要使用另一个工具 <code>sc</code><br>打开cmd窗口（使用Powershell 也可以，但是低版本的Powershell 可能会出错）</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sc</span> create MyService binpath=E:\full\path\to\yourbinaryfile.exe</span><br><span class="line"><span class="comment"># binpath 一定是绝对路径，否则运行服务会提示系统找不到指定文件</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 另外</span></span><br><span class="line"><span class="built_in">sc</span> <span class="built_in">start</span> MyService</span><br><span class="line"><span class="built_in">sc</span> stop MyService</span><br><span class="line"><span class="built_in">sc</span> delete MyService</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>程序在控制台输出，所以安装成服务并不能看到效果。不过，总而言之，使用.netcore创建服务程序很是简单。你可能会想用这种方式用在.netframework上是不是也可以。可以自己尝试。</p>
+<hr>
+<h2 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h2><p>2020年7月13日 补充<br>在.netframework 上使用也是没问题的，但是.netcore 可以跨平台食用</p>
+<p>&amp;emsp;<em>更多创建服务的方式，可以点击下面的引用链接</em></p>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><p><a target="_blank" rel="noopener" href="https://dotnetcoretutorials.com/2019/12/07/creating-windows-services-in-net-core-part-3-the-net-core-worker-way/">Creating Windows Services In .NET Core – Part 3 – The “.NET Core Worker” Way</a></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>潇枫十一</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://blog.iavjkaede.com/2022/05/06/Create%20native%20service%20with%20dotnet/">http://blog.iavjkaede.com/2022/05/06/Create%20native%20service%20with%20dotnet/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/C/"># C#</a>
+                    
+                        <a href="/tags/Service/"># Service</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2022/05/06/WPF%20Prism%207%20with%20MS%20DI/">WPF Prism 7 中使用基于MS DI 的Services</a>
+            
+            
+            <a class="next" rel="next" href="/2022/05/06/Get%20MimeType%20via%20.NET/">.Net 中MimeType 的获取</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 潇枫十一 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+    
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="潇枫十一">
+
+
+    <meta name="subtitle" content="破风万里行，终有雀归日">
+
+
+
+
+<title>NetCore 使用 ImageSharp 为图片添加水印 | 雀归</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.2"><link rel="alternate" href="/atom.xml" title="雀归" type="application/atom+xml">
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">雀归</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/categories">Categories</a>
+                
+                    <a class="menu-item" href="/tags">Tags</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">雀归</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/categories">Categories</a>
+                
+                    <a class="menu-item" href="/tags">Tags</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">NetCore 使用 ImageSharp 为图片添加水印</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">潇枫十一</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">五月 6, 2022&nbsp;&nbsp;22:12:04</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/NET/">.NET</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="环境简介"><a href="#环境简介" class="headerlink" title="环境简介"></a>环境简介</h2><h3 id="系统环境"><a href="#系统环境" class="headerlink" title="系统环境"></a>系统环境</h3><p>Windows10 1903</p>
+<h3 id="NetCore-SDK-版本"><a href="#NetCore-SDK-版本" class="headerlink" title=".NetCore SDK 版本"></a>.NetCore SDK 版本</h3><p>.NetCore 2.2</p>
+<h3 id="ImageSharp-版本"><a href="#ImageSharp-版本" class="headerlink" title="ImageSharp 版本"></a>ImageSharp 版本</h3><p>SixLabors.ImageSharp  1.0.0-beta0006</p>
+<h2 id="1-安装ImageSharp-Nuget-包"><a href="#1-安装ImageSharp-Nuget-包" class="headerlink" title="1.安装ImageSharp Nuget 包"></a>1.安装ImageSharp Nuget 包</h2><p>我写这篇博客时，ImageSharp还没有一个正式的发布版本，所以这里使用的是预览版本。</p>
+<p>如果通过Visual Studio 安装Nuget 包，记得勾选<strong>包含预发行版本</strong>。如果不知道ImageSharp 是什么，可以先百度一下。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/SixLabors/ImageSharp">ImageSharp 项目的 github 地址</a></p>
+<p>通过CLR 安装ImageSharp</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dotnet add <span class="string">&#x27;项目名称&#x27;</span> package SixLabors.ImageSharp --version 1.0.0-beta0006</span><br></pre></td></tr></table></figure>
+
+<h2 id="2-编写添加水印的代码"><a href="#2-编写添加水印的代码" class="headerlink" title="2. 编写添加水印的代码"></a>2. 编写添加水印的代码</h2><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Stream <span class="title">Watermark</span>(<span class="params">Stream origin, Stream mark, <span class="built_in">string</span> position, <span class="built_in">float</span> scale, <span class="built_in">float</span> opacity</span>)</span></span><br><span class="line"> &#123;</span><br><span class="line"></span><br><span class="line">     <span class="comment">// <span class="doctag">TODO:</span> 参数校验</span></span><br><span class="line">     <span class="comment">// origin mark 不可空，</span></span><br><span class="line">     <span class="comment">// position 可指定默认值</span></span><br><span class="line">     <span class="comment">// scale opacity 不可小于等于0</span></span><br><span class="line"></span><br><span class="line">     <span class="comment">// <span class="doctag">TODO:</span> 异常处理</span></span><br><span class="line"></span><br><span class="line">     <span class="keyword">using</span>(<span class="keyword">var</span> originImage = Image.Load(origin))</span><br><span class="line">     &#123;</span><br><span class="line">         <span class="keyword">using</span>(<span class="keyword">var</span> markImage = Image.Load(mark))</span><br><span class="line">         &#123;</span><br><span class="line">             <span class="comment">// 设置水印的大小，如果图片宽大于高， scale缩放的是水印图的宽度，否则将应用到高度上</span></span><br><span class="line">             <span class="built_in">float</span> markWidth = originImage.Width * scale;</span><br><span class="line">             <span class="keyword">if</span> (originImage.Width &lt; originImage.Height)</span><br><span class="line">                 markWidth = originImage.Height * scale;</span><br><span class="line"></span><br><span class="line">             <span class="comment">// 对水印图片进行等比缩放</span></span><br><span class="line">             <span class="built_in">float</span> ratio = markWidth / markImage.Width;</span><br><span class="line">             <span class="built_in">float</span> markHeight = markImage.Height * ratio;</span><br><span class="line"></span><br><span class="line">             markImage.Mutate(mk =&gt;</span><br><span class="line">                 mk.Resize((<span class="built_in">int</span>)markWidth, (<span class="built_in">int</span>)markHeight)</span><br><span class="line"></span><br><span class="line">             );</span><br><span class="line"></span><br><span class="line">             <span class="comment">// 根据position 计算水印位置</span></span><br><span class="line">             <span class="comment">// position可能的值如下 &quot;left top botom center right&quot;</span></span><br><span class="line">             <span class="comment">// 这些值可以进行组合 如果同一方向有重复值，后面的会覆盖掉前面的</span></span><br><span class="line">             <span class="comment">// 按照 中左上右下的顺序处理</span></span><br><span class="line">             position = position.ToLower();</span><br><span class="line">             Point point = <span class="keyword">new</span> Point();</span><br><span class="line"></span><br><span class="line">             <span class="keyword">if</span> (position.Contains(<span class="string">&quot;center&quot;</span>))</span><br><span class="line">             &#123;</span><br><span class="line">                 point.X = (originImage.Width - markImage.Width) / <span class="number">2</span>;</span><br><span class="line">                 point.Y = (originImage.Height - markImage.Height) / <span class="number">2</span>;</span><br><span class="line">             &#125;</span><br><span class="line"></span><br><span class="line">             <span class="keyword">if</span> (position.Contains(<span class="string">&quot;left&quot;</span>))</span><br><span class="line">                 point.X = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">             <span class="keyword">if</span> (position.Contains(<span class="string">&quot;top&quot;</span>))</span><br><span class="line">                 point.Y = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">             <span class="keyword">if</span> (position.Contains(<span class="string">&quot;right&quot;</span>))</span><br><span class="line">                 point.X = originImage.Width - markImage.Width;</span><br><span class="line"></span><br><span class="line">             <span class="keyword">if</span> (position.Contains(<span class="string">&quot;bottom&quot;</span>))</span><br><span class="line">                 point.Y = originImage.Height - markImage.Height;</span><br><span class="line"></span><br><span class="line">             <span class="comment">// 把水印加到图片上</span></span><br><span class="line">             originImage.Mutate(oi =&gt;</span><br><span class="line">             &#123;</span><br><span class="line">                 oi.DrawImage(markImage, point, opacity);</span><br><span class="line">             &#125;);</span><br><span class="line"></span><br><span class="line">             origin.Position = <span class="number">0</span>;</span><br><span class="line">             <span class="keyword">var</span> format  = Image.DetectFormat(origin);</span><br><span class="line">             <span class="keyword">var</span> encoder = Configuration.Default.ImageFormatsManager.FindEncoder(format);</span><br><span class="line">             <span class="keyword">var</span> outStream = <span class="keyword">new</span> MemoryStream();</span><br><span class="line"></span><br><span class="line">             originImage.Save(outStream, encoder);</span><br><span class="line">             origin.Position    = <span class="number">0</span>;</span><br><span class="line">             mark.Position      = <span class="number">0</span>;</span><br><span class="line">             outStream.Position = <span class="number">0</span>;</span><br><span class="line">             <span class="keyword">return</span> outStream;</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>ImageSharp 的使用起来很简单方便，有关更多使用ImageSharp的细节，可以参考<a target="_blank" rel="noopener" href="https://docs.sixlabors.com/articles/ImageSharp/GettingStarted.html">ImageSharp 的文档</a></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>潇枫十一</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://blog.iavjkaede.com/2022/05/06/NetCore%20ImageSharp%20Watermark/">http://blog.iavjkaede.com/2022/05/06/NetCore%20ImageSharp%20Watermark/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/C/"># C#</a>
+                    
+                        <a href="/tags/Image/"># Image</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2022/05/06/NetCore%20Web%20Plugins/">.NetCore Web 项目的插件实现</a>
+            
+            
+            <a class="next" rel="next" href="/2019/06/01/ASP.NET%20Website%20Background%20Job/">ASP.NET 之 IIS托管的后台任务</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 潇枫十一 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+    
+</body>
+</html>

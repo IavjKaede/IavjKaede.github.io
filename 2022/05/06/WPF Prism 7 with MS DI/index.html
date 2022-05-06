@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="潇枫十一">
+
+
+    <meta name="subtitle" content="破风万里行，终有雀归日">
+
+
+
+
+<title>WPF Prism 7 中使用基于MS DI 的Services | 雀归</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.2"><link rel="alternate" href="/atom.xml" title="雀归" type="application/atom+xml">
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">雀归</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/categories">Categories</a>
+                
+                    <a class="menu-item" href="/tags">Tags</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">雀归</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/categories">Categories</a>
+                
+                    <a class="menu-item" href="/tags">Tags</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">WPF Prism 7 中使用基于MS DI 的Services</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">潇枫十一</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">五月 6, 2022&nbsp;&nbsp;22:12:04</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/NET/">.NET</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Prism 是基于WPF 界面技术的MVVM应用框架，框架里集成了IOC容器，默认可以选择的是Unity和DryIoc，出于某种原因，我这里想使用 .netcore 原生IOC容器，下面就讲一下怎么做的，还挺波折的。</p>
+<p>工作环境如下</p>
+<ul>
+<li>VisualStudio 2019</li>
+<li>.netcore 3.1.301</li>
+<li>Prism 7.2.0.1422（DryIoC）</li>
+</ul>
+<h2 id="1-Prism-Container-Extensions"><a href="#1-Prism-Container-Extensions" class="headerlink" title="1. Prism.Container.Extensions"></a>1. Prism.Container.Extensions</h2><p>我先在nuget中查了下和<strong>Prism，IOC</strong>相关的包，发现<code>Prism.Container.Extensions</code> 可能就是解决相关问题的，不错，<br>先装上它。<br>版本<em>7.2.0.1054</em></p>
+<p>安装之后，<code>IContainerRegistry</code>类下面多了一个扩展方法<code>RegisterServices</code>。<br>小试一手</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"> <span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">RegisterTypes</span>(<span class="params">IContainerRegistry containerRegistry</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    containerRegistry.RegisterServices(service =&gt;</span><br><span class="line">    &#123;</span><br><span class="line">        service.AddLogging();</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>看上面的代码，可以用<code>ServiceCollection</code>来进行注入。那么其他的诸如 AddOptions,AddDbContext 操作是不是易如反掌呢，看样子倒是异常容易。</p>
+<p>不料运行就抛出异常了。</p>
+<p><code>System.NotImplementedException:“The method or operation is not implemented.”</code></p>
+<p><code>System.NotImplementedException:“The method or operation is not implemented.”</code></p>
+<p><code>System.NotImplementedException:“The method or operation is not implemented.”</code></p>
+<p>我下载了项目的源码然后跟踪了一下错误，大致问题就是在扩展方法<code>RegisterServices</code>中注入Scope生命周期的服务时便会出错，尚无对应实现，也就是当前Prism里不支持注入Scope生命周期的依赖。</p>
+<h2 id="2-Prism-Microsoft-DependencyInjection"><a href="#2-Prism-Microsoft-DependencyInjection" class="headerlink" title="2. Prism.Microsoft.DependencyInjection"></a>2. Prism.Microsoft.DependencyInjection</h2><p>上面的方式行不通，为什么不读一下文档呢？<br>于是乎打开 Prism.Container.Extensions 的 <a target="_blank" rel="noopener" href="https://github.com/dansiegel/Prism.Container.Extensions">github</a>主页，<br>翻阅Prism 的<a target="_blank" rel="noopener" href="https://prismplugins.com/">文档</a>。示例给出了这样的用法。😥</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">PrismContainerExtension.Current.RegisterServices(s =&gt; &#123;</span><br><span class="line">    s.AddHttpClient();</span><br><span class="line">    s.AddDbContext&lt;AwesomeAppDbContext&gt;(o =&gt; o.UseSqlite(<span class="string">&quot;my connection string&quot;</span>));</span><br><span class="line">&#125;);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>我马上依照上面的用法做了尝试，关键代码如下。</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">PrismContainerExtension.Current.RegisterServices(services =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    services.AddLogging();</span><br><span class="line"></span><br><span class="line">&#125;);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>！需要安装 Prism.Microsoft.DependencyInjection</strong><br><em>此处使用的版本 7.0.2.1054</em></p>
+<p>这里注入是没有问题了，但是在ViewModel 的构造里面却无法正确解析<code>ILogger</code>，导致IOC抛出异常，无法构造ViewModel。具体原因不详，要获取<code>ILogger</code>的实例，只能通过<code>PrismContainerExtension.Current。Resolve&lt;ILogger&lt;MainWindowViewModel&gt;&gt;();</code> 这个是可以获取到的，但这不是我想要的结果，我期望能在构造函数中成功解析依赖，这显然也行不通。</p>
+<h2 id="3-DryIoc-Microsoft-DependencyInjection"><a href="#3-DryIoc-Microsoft-DependencyInjection" class="headerlink" title="3. DryIoc.Microsoft.DependencyInjection"></a>3. DryIoc.Microsoft.DependencyInjection</h2><p>于是开始查阅项目的issue</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/dansiegel/Prism.Container.Extensions/issues/100">PrismApplicationBase.Container having difficulty resolving ILogger&lt;T&gt;</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/PrismLibrary/Prism/issues/1352">Prism.Forms dependency injection IServiceCollection problem</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/dadhi/DryIoc/issues/287">Cannot register grpc client using ms ioc and dryioc</a></p>
+<p>这几个issue 帮助极大，我这里就直接总结一下方法。<br>此处不再依赖 <code>Prism.Container.Extensions</code>。<br>而是从 DryIoc 下手，只要能在DryIoc  中注入ServiceCollection 就大功告成了。</p>
+<ol>
+<li>安装 <code>DryIoc.Microsoft.DependencyInjection</code></li>
+<li>使用重载方法 <code>CreateContainerExtension</code>完成注入</li>
+</ol>
+<p>代码如下</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> IContainerExtension <span class="title">CreateContainerExtension</span>()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">var</span> containerExtension = <span class="keyword">base</span>.CreateContainerExtension() <span class="keyword">as</span> DryIocContainerExtension;</span><br><span class="line"></span><br><span class="line">    ServiceCollection services = <span class="keyword">new</span> ServiceCollection();</span><br><span class="line">    services.AddLogging();</span><br><span class="line">    containerExtension.Instance.Populate(services);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> containerExtension;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这样便达成了目标，贴下<code>App.xaml.cs</code> 完整代码</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">using</span> Prism.Ioc;</span><br><span class="line"><span class="keyword">using</span> BlankCoreApp1.Views;</span><br><span class="line"><span class="keyword">using</span> System.Windows;</span><br><span class="line"><span class="keyword">using</span> Microsoft.Extensions.DependencyInjection;</span><br><span class="line"><span class="keyword">using</span> Prism.DryIoc.Ioc;</span><br><span class="line"><span class="keyword">using</span> DryIoc.Microsoft.DependencyInjection;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">BlankCoreApp1</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> Interaction logic for App.xaml</span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">partial</span> <span class="keyword">class</span> <span class="title">App</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> Window <span class="title">CreateShell</span>()</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span> Container.Resolve&lt;MainWindow&gt;();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> IContainerExtension <span class="title">CreateContainerExtension</span>()</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">var</span> containerExtension = <span class="keyword">base</span>.CreateContainerExtension() <span class="keyword">as</span> DryIocContainerExtension;</span><br><span class="line"></span><br><span class="line">            ServiceCollection services = <span class="keyword">new</span> ServiceCollection();</span><br><span class="line">            services.AddLogging();</span><br><span class="line">            containerExtension.Instance.Populate(services);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> containerExtension;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">RegisterTypes</span>(<span class="params">IContainerRegistry containerRegistry</span>)</span></span><br><span class="line">        &#123;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="终"><a href="#终" class="headerlink" title="终"></a>终</h2><p>Prism 8 可能会在这个问题上有所改变。<br>这个问题上浪费了一些时间，此处小记。</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a target="_blank" rel="noopener" href="https://github.com/dadhi/DryIoc/issues/287">Cannot register grpc client using ms ioc and dryioc · Issue #287 · dadhi&#x2F;DryIoc</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/PrismLibrary/Prism/issues/1352">Prism.Forms dependency injection IServiceCollection problem · Issue #1352 · PrismLibrary&#x2F;Prism</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/dansiegel/Prism.Container.Extensions">dansiegel&#x2F;Prism.Container.Extensions: The packages here provide additional extensions around the Prism Ioc abstractions. This allows for more advanced scenarios.</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/dansiegel/Prism.Container.Extensions/issues/100">PrismApplicationBase.Container having difficulty resolving ILogger&lt;T&gt; · Issue #100 · dansiegel&#x2F;Prism.Container.Extensions</a></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>潇枫十一</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://blog.iavjkaede.com/2022/05/06/WPF%20Prism%207%20with%20MS%20DI/">http://blog.iavjkaede.com/2022/05/06/WPF%20Prism%207%20with%20MS%20DI/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/C/"># C#</a>
+                    
+                        <a href="/tags/Prism/"># Prism</a>
+                    
+                        <a href="/tags/WPF/"># WPF</a>
+                    
+                        <a href="/tags/IOC/"># IOC</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2022/05/06/Create%20native%20service%20with%20dotnet/">基于netcore 编写本地服务</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 潇枫十一 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+    
+</body>
+</html>

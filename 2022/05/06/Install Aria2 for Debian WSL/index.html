@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="潇枫十一">
+
+
+    <meta name="subtitle" content="破风万里行，终有雀归日">
+
+
+
+
+<title>Linux子系统（WSL）Debian安装aria2并配置AriaNg | 雀归</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.4.2"><link rel="alternate" href="/atom.xml" title="雀归" type="application/atom+xml">
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">雀归</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/categories">Categories</a>
+                
+                    <a class="menu-item" href="/tags">Tags</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">雀归</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/categories">Categories</a>
+                
+                    <a class="menu-item" href="/tags">Tags</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Linux子系统（WSL）Debian安装aria2并配置AriaNg</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">潇枫十一</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">五月 6, 2022&nbsp;&nbsp;22:12:04</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/Deploy/">Deploy</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h2 id="环境简介"><a href="#环境简介" class="headerlink" title="环境简介"></a>环境简介</h2><h3 id="系统环境"><a href="#系统环境" class="headerlink" title="系统环境"></a>系统环境</h3><p>Window 10 LTSC 2019  <strong>开启WSL</strong></p>
+<p>WSL 使用 <strong>Debian 发行版</strong></p>
+<h3 id="Shell-环境"><a href="#Shell-环境" class="headerlink" title="Shell 环境"></a>Shell 环境</h3><p>ZSH</p>
+<h3 id="将安装的软件版本"><a href="#将安装的软件版本" class="headerlink" title="将安装的软件版本"></a>将安装的软件版本</h3><p>aria2 &amp;emsp;版本 <strong>1.30.0</strong></p>
+<p>AriaNg  版本 <strong>1.1.1</strong></p>
+<h2 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h2><h3 id="安装aria2"><a href="#安装aria2" class="headerlink" title="安装aria2"></a>安装aria2</h3><p>首先进行<a target="_blank" rel="noopener" href="https://github.com/aria2/aria2">aria2</a> 的安装</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install aria2</span><br></pre></td></tr></table></figure>
+
+<p>安装完成输入以下命令查看安装是否成功</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aria2c --version</span><br></pre></td></tr></table></figure>
+
+<p>成功输出版本信息后，安装就完成了</p>
+<h3 id="配置aria2"><a href="#配置aria2" class="headerlink" title="配置aria2"></a>配置aria2</h3><p>安装是很简单的，配置aria2 却是有些棘手的，讲一下我自己的配置。</p>
+<p>创建三个文件，分别用来保存aria2 的配置、会话和日志。</p>
+<p>我这里在用户目录下建立文件夹，其实可以将配置目录放在Windows目录下，这样重新安装WSL的时候就无需重新创建编写配置文件了。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span></span><br><span class="line"><span class="built_in">mkdir</span> .aria2</span><br><span class="line"><span class="built_in">cd</span> .aria2</span><br><span class="line"><span class="built_in">touch</span> aria2.conf</span><br><span class="line"><span class="built_in">touch</span> aria2.session</span><br><span class="line"><span class="built_in">touch</span> aria2.log</span><br></pre></td></tr></table></figure>
+
+<p>完成后进行aria2 的配置，这里只记录我自己的配置，详细配置自行搜索查阅。</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Log Options</span></span><br><span class="line"></span><br><span class="line"><span class="attr">log-level</span>=warn</span><br><span class="line"><span class="attr">log</span>=/home/<span class="variable">$LOGNAME</span>/.aria2/aria2.log</span><br><span class="line"></span><br><span class="line"><span class="comment"># Running on background</span></span><br><span class="line"><span class="attr">daemon</span>=<span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Download path</span></span><br><span class="line"><span class="comment"># 下载地址，可以放在Windows系统的目录下，比如以下是E盘的download</span></span><br><span class="line"><span class="attr">dir</span>=/mnt/e/Download</span><br><span class="line"></span><br><span class="line"><span class="comment"># Session Options</span></span><br><span class="line"><span class="attr">input-file</span>=/home/<span class="variable">$LOGNAME</span>/.aria2/aria2.session</span><br><span class="line"><span class="attr">save-session</span>=/home/<span class="variable">$LOGNAME</span>/.aria2/aria2.session</span><br><span class="line"><span class="attr">save-session-interval</span>=<span class="number">30</span></span><br><span class="line"></span><br><span class="line"><span class="attr">continue</span>=<span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Disk cache</span></span><br><span class="line"><span class="attr">disk-cache</span>=<span class="number">32</span>M</span><br><span class="line"></span><br><span class="line"><span class="comment"># RPC Options</span></span><br><span class="line"><span class="comment"># 因为只在本地使用，不用rpc安全设置也可以</span></span><br><span class="line"><span class="attr">enable-rpc</span>=<span class="literal">true</span></span><br><span class="line"><span class="attr">rpc-allow-origin-all</span>=<span class="literal">true</span></span><br><span class="line"><span class="attr">rpc-listen-port</span>=<span class="number">6800</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 其他更详细的配置自行查阅吧，或者待会我们配置AriaNg就可以具体看可以配置哪些内容了</span></span><br></pre></td></tr></table></figure>
+
+<p>使用配置文件启动 aria2</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aria2c --conf-path /home/<span class="variable">$LOGNAME</span>/.aria2/aria2.conf</span><br></pre></td></tr></table></figure>
+
+<p>！<em>配置这个地方可能会有坑，如果配置文件写错了，这个命令可能没有任何报错就退出了，或者rpc没有成功开启。执行完这条命令后，在浏览器地址栏输入</em> <a target="_blank" rel="noopener" href="http://localhost:6800/">http://localhoost:6800</a></p>
+<p><em>如果出现404而不是未响应，说明rpc是正常开启了的（在没有其他进程占用6800端口的情况下），这里提及的端口号对应配置文件中的端口号<code>rpc-listen-port</code></em></p>
+<p>另外，我不知道aria2 有没有检查配置文件的命令，我是用笨方法排除错误，把配置文件的<code>daemon=true</code> 去掉然后使用配置文件启动aria2c，会提示错误信息的。如果没有提示，可以先把不重要的配置注释掉再次启动，rpc是一定要开启的，其他配置对我来说比较次要。</p>
+<h3 id="配置AriaNg"><a href="#配置AriaNg" class="headerlink" title="配置AriaNg"></a>配置AriaNg</h3><p>配置好aria2 可是如果每次下载文件都去执行命令，虽然很hacker，但并不是我想要的。我选择使用<a target="_blank" rel="noopener" href="https://github.com/mayswind/AriaNg">AriaNg</a>来操作aria2 ，AriaNg是一个基于Web的arai2 前端。可以在<strong>github</strong> 的<strong>Release</strong>页面中下载<strong>AllInOne</strong>版本。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/mayswind/AriaNg">AriaNg Github</a></p>
+<p>AllInOne 版本里面包含一个html文件，这就是我要的，我们直接双击打开在浏览器中查看。</p>
+<p>当看到左侧菜单栏最后一条有已连接的绿色标志，表示链接成功。如果一致显示未连接，那可能是配置出了问题，应该仔细看看有没有正确<strong>配置aria2</strong>。</p>
+<p>到这时候，我们已经能愉快的使用aria2了，但是，我还想完成两件事情。</p>
+<ul>
+<li><p>我希望把AriaNg部署成Web服务，而不是直接在本地去打开html文件（这很不酷）</p>
+</li>
+<li><p>我希望每次开机的时候自动启动aria2c</p>
+</li>
+</ul>
+<h4 id="配置静态文件服务"><a href="#配置静态文件服务" class="headerlink" title="配置静态文件服务"></a>配置静态文件服务</h4><p>这里我将使用Nodejs来实现。</p>
+<p>有关如何在WSL中安装Nodejs，请参考 <a href="/2022/05/06/Install%20nodejs%20for%20Debian%20WSL/" title="Linux子系统（WSL）Debian安装Nodejs">Linux子系统（WSL）Debian安装Nodejs</a></p>
+<p>安装好Nodejs 后，确定一下npm 命令。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm --version</span><br></pre></td></tr></table></figure>
+
+<p>&amp;emsp;&amp;emsp;建立一个目录存放静态页，将AriaNg（Index.html)文件放在该目录下，并cd 到该目录<br><strong>当然，如果你使用nginx托管静态页，那可以直接看开机自启那部分</strong></p>
+<p>建立一个用于支持web服务的js文件。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">touch</span> server.js</span><br></pre></td></tr></table></figure>
+
+<p>编辑该文件输入以下内容并保存。</p>
+<p>！<strong>server.js</strong></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> express = <span class="built_in">require</span>(<span class="string">&quot;express&quot;</span>);</span><br><span class="line"><span class="keyword">let</span> app = <span class="title function_">express</span>();</span><br><span class="line"></span><br><span class="line">app.<span class="title function_">use</span>(express.<span class="title function_">static</span>(<span class="string">&quot;./&quot;</span>));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 端口号自行配置</span></span><br><span class="line">app.<span class="title function_">listen</span>(<span class="number">8081</span>,<span class="function">()=&gt;</span>&#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Server start !&#x27;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>emmmm，现在还不能运行，需要装一下<strong>express</strong> 依赖包✔</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install express --save</span><br></pre></td></tr></table></figure>
+
+<p>启动服务</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">node server.js</span><br></pre></td></tr></table></figure>
+
+<p>！<em>这几个命令都是在最初建立的目录下完成的</em></p>
+<p>当你看到终端输出<code>Server start !</code>，去浏览器输出<a target="_blank" rel="noopener" href="http://localhost:8081/">http://localhost:8081</a>，看是不是打开了AriaNg👌。</p>
+<p>现在打开了静态页服务，不过它还是在终端下执行的，关掉终端后，静态页服务也就关了。</p>
+<h4 id="用Supervisor守护进程"><a href="#用Supervisor守护进程" class="headerlink" title="用Supervisor守护进程"></a>用Supervisor守护进程</h4><p>首先安装Supervisor</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install supervisor</span><br></pre></td></tr></table></figure>
+
+<p>在我使用的debian中，安装后会在 <code>/etc/supervisor</code> 生成一个<strong>supervisord.conf</strong>文件和一个<strong>conf.d</strong>目录，我们可以在conf.d目录中建立配置。supervisord.conf文件中已经包含了它。<em>不能保证使用的环境都是一样的，这里只是我自己的环境。</em></p>
+<h5 id="建立ariaNg-的supervisor配置文件"><a href="#建立ariaNg-的supervisor配置文件" class="headerlink" title="建立ariaNg 的supervisor配置文件"></a>建立ariaNg 的supervisor配置文件</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /etc/supervisor/conf.d</span><br><span class="line">sudo vi ariaNg.conf</span><br></pre></td></tr></table></figure>
+
+<p>配置文件内容如下</p>
+<p>！<strong>ariaNg.conf</strong></p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[program:ariaNg]</span></span><br><span class="line"><span class="attr">command</span>=node server.js</span><br><span class="line"><span class="attr">directory</span>=/home/ariaNg  <span class="comment">#配置静态页的目录</span></span><br><span class="line"><span class="attr">user</span>=root</span><br><span class="line"><span class="attr">autorestart</span>=<span class="literal">true</span></span><br><span class="line"><span class="attr">stderr_logfile</span>=/var/log/ariaNg/err.log</span><br><span class="line"><span class="attr">stdout_logfile</span>=/var/log/ariaNg/out.log</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h5 id="启动supervisor"><a href="#启动supervisor" class="headerlink" title="启动supervisor"></a>启动supervisor</h5><p>在启动supervisor前，可能需要建立ariaNg的日志目录</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo <span class="built_in">mkdir</span> /var/log/ariaNg</span><br></pre></td></tr></table></figure>
+
+<p>启动supervisor服务</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo service supervisor start</span><br></pre></td></tr></table></figure>
+
+<p>查看下运行状态</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo supervisorctl status</span><br></pre></td></tr></table></figure>
+
+<p>看到<code>aria2Ng                          RUNNING</code> 然后去浏览器访问一下确定是否成功。</p>
+<p>使用supervisorctl 的过程中可能会报<strong>unix:&#x2F;&#x2F;&#x2F;var&#x2F;run&#x2F;supervisor.sock no such file</strong>这个错误。不要慌。</p>
+<p>可以先看一下ariaNg 的log文件，看看是哪个地方出了问题。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cat</span> /var/log/ariaNg/err.log</span><br></pre></td></tr></table></figure>
+
+<p>如果是配置的问题，就去修改配置文件。</p>
+<p>然后停止supervisor 服务，再次启动。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo service supervisor stop</span><br><span class="line">sudo service supervisor start</span><br><span class="line"></span><br><span class="line">sudo supervisorctl status</span><br></pre></td></tr></table></figure>
+
+<p>当所有一切都配置好后，我们只需要在浏览器中就能使用aria2 了，不过，我还希望它们能在开机时自动启动。</p>
+<h3 id="开机自动启动aria2"><a href="#开机自动启动aria2" class="headerlink" title="开机自动启动aria2"></a>开机自动启动aria2</h3><p>我可不想每次开机都要打开命令行然后输入命令去启动aria2</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">aria2c --conf-path /home/<span class="variable">$LOGNAME</span>/.aria2/aria2.conf</span><br><span class="line">sudo service supervisor</span><br></pre></td></tr></table></figure>
+
+<p>废话少说，有关如何设置在WSL中开机自动启动服务的方法先去这看一下吧。</p>
+<a href="/2019/03/02/WSL%20Service%20Autostart/" title="Linux子系统(WSL)中的服务开机启动">Linux子系统(WSL)中的服务开机启动</a>
+
+<p>配置好开机自启脚本后，只需要在init.wsl 中加入以下命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/etc/init.d/supervisor <span class="variable">$1</span></span><br><span class="line">aria2c --conf-path=/home/xiaosen/.aria2/aria2.conf</span><br></pre></td></tr></table></figure>
+
+<p>搞定👏👏👏</p>
+<h3 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h3><p>这大概就是我安装使用aria2 的整个过程了。</p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/6adf79d29add">Aria2 配置详解</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/wenwushq/article/details/79827718">用nodejs搭建静态网页服务器居然这么简单</a></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>潇枫十一</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="http://blog.iavjkaede.com/2022/05/06/Install%20Aria2%20for%20Debian%20WSL/">http://blog.iavjkaede.com/2022/05/06/Install%20Aria2%20for%20Debian%20WSL/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/WSL/"># WSL</a>
+                    
+                        <a href="/tags/Aria2/"># Aria2</a>
+                    
+                        <a href="/tags/Debian/"># Debian</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2022/05/06/Get%20MimeType%20via%20.NET/">.Net 中MimeType 的获取</a>
+            
+            
+            <a class="next" rel="next" href="/2022/05/06/Install%20nodejs%20for%20Debian%20WSL/">Linux子系统（WSL）Debian安装Nodejs</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© 潇枫十一 | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+    
+</body>
+</html>
